@@ -25,7 +25,8 @@ public class Astar
         //step 2 -> add all available nodes to the open list.
         foreach (Cell cell in grid)
         {
-            int tempGscore = CalculateDistance(startPos, cell.gridPosition);
+            //int tempGscore = CalculateDistance(startPos, cell.gridPosition);
+            int tempGscore = int.MaxValue;
             int tempHscore = CalculateDistance(cell.gridPosition, endPos);
             Node tempParent = null;
             Vector2Int tempPos = cell.gridPosition;
@@ -34,6 +35,7 @@ public class Astar
         }
 
         Node currentNode = openList.Find(x => x.position == startPos);
+        currentNode.GScore = 0;
 
         while (openList.Count > 0)
         {
@@ -49,7 +51,14 @@ public class Astar
                 neighbourNode.HScore = CalculateDistance(neighbourNode.position, endPos);
             }
 
-            currentNode = GetLowestFScoreNode(GetNeighbourList(currentNode, openList, grid));
+            Node lowestnode = GetLowestFScoreNode(GetNeighbourList(currentNode, openList, grid));
+
+            if (lowestnode != null)
+            {
+                currentNode = lowestnode;
+            }
+                
+
             if (currentNode.position == endPos)
             {
                 return CalculatePath(currentNode);
@@ -75,35 +84,6 @@ public class Astar
             }
         }
 
-        //check if the current tile has any walls on the left or top side.
-        if (!grid[currentNode.position.x, currentNode.position.y].HasWall(Wall.LEFT) && !grid[currentNode.position.x, currentNode.position.y].HasWall(Wall.UP))
-        {
-            //left up
-            Node leftUNode = openNodes.Find(x => x.position == new Vector2Int((currentNode.position.x - 1), (currentNode.position.y + 1)));
-            if (leftUNode != null)
-            {
-                //prevent going through walls by double checking the top left tile.
-                if (!grid[currentNode.position.x - 1, currentNode.position.y + 1].HasWall(Wall.RIGHT) && !grid[currentNode.position.x - 1, currentNode.position.y + 1].HasWall(Wall.DOWN))
-                {
-                    neighbourList.Add(leftUNode);
-                }
-            }
-        }
-
-        if (!grid[currentNode.position.x, currentNode.position.y].HasWall(Wall.LEFT) && !grid[currentNode.position.x, currentNode.position.y].HasWall(Wall.DOWN))
-        {
-            //left down
-            Node leftDNode = openNodes.Find(x => x.position == new Vector2Int((currentNode.position.x - 1), (currentNode.position.y - 1)));
-            if (leftDNode != null)
-            {
-                //prevent going through walls by double checking the bottom left tile.
-                if (!grid[currentNode.position.x - 1, currentNode.position.y - 1].HasWall(Wall.RIGHT) && !grid[currentNode.position.x - 1, currentNode.position.y - 1].HasWall(Wall.UP))
-                {
-                    neighbourList.Add(leftDNode);
-                }
-            }
-        }
-
         //The right node is accessible if there is no wall on the right side of the current tile
         if (!grid[currentNode.position.x, currentNode.position.y].HasWall(Wall.RIGHT))
         {
@@ -112,36 +92,6 @@ public class Astar
             if (rightNode != null)
             {
                 neighbourList.Add(rightNode);
-            }
-        }
-
-        
-        if (!grid[currentNode.position.x, currentNode.position.y].HasWall(Wall.RIGHT) && !grid[currentNode.position.x, currentNode.position.y].HasWall(Wall.UP))
-        {
-            //right up
-            Node rightUNode = openNodes.Find(x => x.position == new Vector2Int((currentNode.position.x + 1), (currentNode.position.y + 1)));
-            if (rightUNode != null)
-            {
-                //prevent going through walls by double checking the top right tile.
-                if (!grid[currentNode.position.x + 1, currentNode.position.y + 1].HasWall(Wall.LEFT) && !grid[currentNode.position.x + 1, currentNode.position.y + 1].HasWall(Wall.DOWN))
-                {
-                    neighbourList.Add(rightUNode);
-                }
-            }
-        }
-
-        
-        if (!grid[currentNode.position.x, currentNode.position.y].HasWall(Wall.RIGHT) && !grid[currentNode.position.x, currentNode.position.y].HasWall(Wall.DOWN))
-        {
-            //right down
-            Node rightDNode = openNodes.Find(x => x.position == new Vector2Int((currentNode.position.x + 1), (currentNode.position.y - 1)));
-            if (rightDNode != null)
-            {
-                //prevent going through walls by double checking the bottom right tile.
-                if (!grid[currentNode.position.x + 1, currentNode.position.y - 1].HasWall(Wall.LEFT) && !grid[currentNode.position.x + 1, currentNode.position.y - 1].HasWall(Wall.UP))
-                {
-                    neighbourList.Add(rightDNode);
-                }
             }
         }
 
