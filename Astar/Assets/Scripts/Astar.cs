@@ -48,10 +48,9 @@ public class Astar
 
                 neighbourNode.parent = currentNode;
                 neighbourNode.GScore = tentativeGScore;
-                neighbourNode.HScore = CalculateDistance(neighbourNode.position, endPos);
             }
 
-            Node lowestnode = GetLowestFScoreNode(GetNeighbourList(currentNode, openList, grid));
+            Node lowestnode = GetLowestFScoreNode(openList);
 
             if (lowestnode != null)
             {
@@ -148,14 +147,20 @@ public class Astar
 
     private int CalculateDistance(Vector2Int a, Vector2Int b)
     {
-        int xDistance = Mathf.Abs(a.x - b.x);
-        int yDistance = Mathf.Abs(a.y - b.y);
-        int remaining = Mathf.Abs(xDistance - yDistance);
-        return 14 * Mathf.Min(xDistance, yDistance) + 10 * remaining;
+        int dx = Mathf.Abs(b.x - a.x);
+        int dy = Mathf.Abs(b.y - b.y);
+        int distance = dx + dy;
+
+        return distance;
     }
 
     private Node GetLowestFScoreNode(List<Node> nodeList)
     {
+        if(nodeList.Count == 0)
+        {
+            return null;
+        }
+
         Node lowestNode = nodeList[0];
         
         for(int i =0; i < nodeList.Count; i++)
